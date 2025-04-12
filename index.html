@@ -125,8 +125,8 @@
               var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
               var data = imageData.data; // Pixel data is in a 1D array
          // Create a new blank imageData object for the second canvas 
-      var blueImage = context2.createImageData(canvas.width, canvas.height);
-      var blueData = blueImage.data;
+              var blueImage = context2.createImageData(canvas.width, canvas.height);
+              var blueData = blueImage.data;
             
       // Loop through each pixel in the image (4 values per pixel: R, G, B, A)
               for (var i = 0; i < data.length; i += 4) {
@@ -140,7 +140,7 @@
         // Draw the blue-only image onto the second canvas
               context2.putImageData(blueImage, 0, 0);
                console.log("Blue-only image rendered.");
-          } 
+          }; 
        
        // End of img.onload, rest is continuation of Dr. Riedel's code
         

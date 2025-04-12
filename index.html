@@ -129,7 +129,7 @@
   for (let i = 0; i < data.length; i += 4) {
     blueData[i] = 0;          // Red
     blueData[i + 1] = 0;      // Green
-    blueData[i + 2] = data[i + 2]; // Blue
+    blueData[i + 2] = data[i + 2]; // Blue (preserve original value)
     blueData[i + 3] = 255;    // Alpha
   }
 
@@ -169,9 +169,9 @@
       </div>
       <div id="messageDisplayArea"></div>
       
-      <canvas id="myCanvas" width=600 height=500 style="border:1px solid #d3d3d3;"></canvas>
-      <canvas id="dataCanvas" width="600" height="500" style="border:1px solid #d3d3d3; margin-top: 10px;"></canvas>
-    </div><!-- /content -->
+      <canvas id="myCanvas" style="border:1px solid #d3d3d3;"></canvas>
+<canvas id="dataCanvas" style="border:1px solid #d3d3d3; margin-top:10px;"></canvas>
+     
     <div data-role="footer" data-position="fixed">
       <p>DIY Diagnostics</p>
     </div><!-- /footer -->

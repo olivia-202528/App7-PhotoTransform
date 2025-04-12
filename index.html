@@ -14,7 +14,7 @@
  
   Authors in chronological order of contribution:
   Author 1: Timothy E. Riedel
-  Author 2: ?????????
+  Author 2: Olivia Lopez
   
   References:
   http://docs.webplatform.org/wiki/concepts/programming/drawing_images_onto_canvas#Loading_the_image_programmatically
@@ -24,10 +24,10 @@
   http://stackoverflow.com/questions/11929099/html5-canvas-drawimage-ratio-bug-ios
   
   Brief Description of Goal of Code:
-  blah, blah, blah,
+  Program an app that allows the user to upload an image which will be duplicated and turned blue.
  
   Known Issues:
-  blah, blah, blah, blah
+  
 -->
 
  <head>
@@ -102,7 +102,10 @@
 
           /* PUT ANY CHANGES TO THE JAVASCRIPT HERE  */
           
-          
+      // Get image data (pixel info) from the original canvas
+              var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+              var data = imageData.data; // Pixel data is in a 1D array [R,G,B,A,R,G,B,A,...]
+
           
           
         } // end of img.onload

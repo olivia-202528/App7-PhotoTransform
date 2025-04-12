@@ -162,6 +162,17 @@
         context.fillStyle = "black";
         context.fillText("Original image will go here", 10, 20);
       </script>
+      <!-- Blue-only image canvas, uses same layout just a second copy of the image which will be modified-->
+     <canvas id="dataCanvas" width="600" height="500" style="border:1px solid #d3d3d3; margin-top: 10px;"></canvas>
+     <script>
+     var canvas2 = document.getElementById('dataCanvas');
+     var context2 = canvas2.getContext("2d");
+     context2.font = '20pt Calibri';
+     context2.fillStyle = "black";
+     context2.fillText("Blue intensity image will go here", 10, 20);
+  </script>
+</div>
+   
 
     </div><!-- /content -->
     <div data-role="footer" data-position="fixed">

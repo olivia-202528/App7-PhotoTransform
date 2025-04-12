@@ -108,7 +108,10 @@
       // Get the second canvas and its context
               var canvas2 = document.getElementById('dataCanvas');
               var context2 = canvas2.getContext("2d");          
-          
+      // Create a new blank imageData object for the second canvas
+              var blueImage = context2.createImageData(canvas2.width, canvas2.height);
+              var blueData = blueImage.data;
+
         } // end of img.onload
         
         img.src = reader.result;

@@ -30,170 +30,154 @@
   
 -->
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Photo Transform</title>
-    <meta name="viewport" content="width=device-width, initial-scale=.7">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
-    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-    <script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+ <head>
+  <meta charset="utf-8"> <!-- Sets character coding for the document -->
+  <title>Photo Transform</title> <!-- Page title shown in browser tab -->
+  <meta name="viewport" content="width=device-width, initial-scale=.7"> <!-- Ensures page scales properly on mobile -->
+  <meta name="apple-mobile-web-app-capable" content="yes"> <!-- Allows app-like behavior on iOS --> 
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+   <!-- Load jQuery and jQuery Mobile styles/scripts -->
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 
-    <script>
-        // Get the last modified date of the document
-        var docMod = document.lastModified;
-        console.log("This file last modified: " + docMod); // Display in the console
+ <script>
+  var docMod = document.lastModified; // gets last modified date and time of the index.html file
+  console.log("This file last modified  " + docMod); // displays last modified date and time in the javascipt browser console 
 
-        /* detectVerticalSquash & drawImageIOSFix = are functions that are critical due to a flaw in the iPhone camera software that squishes any photos displayed on an HTML5 canvas element. https://github.com/stomita/ios-imagefile-megapixel
-        */
-        function detectVerticalSquash(img) {
-            var iw = img.naturalWidth, ih = img.naturalHeight; // Get width and height
-            var canvas = document.createElement('canvas'); // Create a temporary canvas that will be used as template
-            canvas.width = 1; // Only 1 pixel wide
-            canvas.height = ih; // Full height
-            var ctx = canvas.getContext('2d'); // Get context
-            ctx.drawImage(img, 0, 0);  // Draw image to temp canvas
-            var data = ctx.getImageData(0, 0, 1, ih).data; // Get image data
-            var sy = 0;
-            var ey = ih;
-            var py = ih;
-            while (py > sy) {
-                var alpha = data[(py - 1) * 4 + 3];
-                if (alpha === 0) {
-                    ey = py;
-                }
-                else {
-                    sy = py;
-                }
-                py = (ey + sy) >> 1;
-            }
-            var ratio = (py / ih);
-            return (ratio === 0) ? 1 : ratio; // Return ratio for scaling fix
-        }
-        // Fix drawing squished images on iOS using vertical squash ratio
-        function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) { // Detect vertical squash
-            var vertSquashRatio = detectVerticalSquash(img);
-            ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio); // Draw image with corrected height
-        }
+/* detectVerticalSquash & drawImageIOSFix = are functions that are critical due to a flaw in the iPhone camera software that squishes any photos displayed on an HTML5 canvas element. https://github.com/stomita/ios-imagefile-megapixel
+*/
+ function detectVerticalSquash(img) {
+  var iw = img.naturalWidth, ih = img.naturalHeight; // Get width and height
+  var canvas = document.createElement('canvas'); // Create a temporary canvas that will be used as template
+  canvas.width = 1; // Only 1 pixel wide
+  canvas.height = ih; // Full height
+  var ctx = canvas.getContext('2d'); // Get context
+  ctx.drawImage(img, 0, 0);  // Draw image to temp canvas
+  var data = ctx.getImageData(0, 0, 1, ih).data; // Get image data
+  var sy = 0;
+  var ey = ih;
+  var py = ih;
+  while (py > sy) {
+   var alpha = data[(py - 1) * 4 + 3];
+   if (alpha === 0) {
+    ey = py;
+   } 
+   else {
+    sy = py;
+   }
+   py = (ey + sy) >> 1;
+  }
+  var ratio = (py / ih);
+  return (ratio===0)?1:ratio; // Return ratio for scaling fix
+ }
+// Fix drawing squished images on iOS using vertical squash ratio
+  function drawImageIOSFix(ctx, img, sx, sy, sw, sh, dx, dy, dw, dh) { // Detect vertical squash
+  var vertSquashRatio = detectVerticalSquash(img);
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh / vertSquashRatio); // Draw image with corrected height
+ }
 
-        // Execute when the window is fully loaded
-        window.onload = function () {
-            // Initialize the first canvas
-            var canvas = document.getElementById('myCanvas');
-            var context = canvas.getContext("2d");
-            context.font = '20pt Calibri';
-            context.fillStyle = "black";
-            context.fillText("Original image will go here", 10, 20);
+/* window.onload necessary to keep javascripts from running before the app gets a chance to load entirely. */
+ window.onload = function() {
+  var fileInput = document.getElementById('fileInput');
+  var messageDisplayArea = document.getElementById('messageDisplayArea');
+  /* fileInput.addEventListener looks for any change in the <input> tag indicating that the user has selected a file (picture). */
+  fileInput.addEventListener('change', function(e) {
+    var file = fileInput.files[0];
+    var imageType = /image.*/;
+    /* if (file.type.match(imageType)) checks that the selected file is indeed an image. */
+    if (file.type.match(imageType)) {
+      /* new FileReader(); and reader.onload start some kind of file reading process in javaScript. I do not understand why this is necessary although it may simply slow things down to let the image load. */
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        /* messageDisplayArea.innerHTML not needed but allows you to send a message at this point in the program. */
+        messageDisplayArea.innerHTML = "You picked an image!";
+        /* new Image() and img.onload start some kind of new image creation process in javaScript. I do not understand why this is necessary although it may simply slow things down to let the image load. */
+        var img = new Image();
+        img.onload = function() {
+          /*This finally draws the image onto the first drawing canvas. The specific canvas is referred to by "context". This is established down in the HTML part of the file just under the first <canvas> tag. If we weren't worried about fixing an iPhone bug we would use context.drawImage(image, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 600, 500) instead of drawImageIOSFix */
+        
+          drawImageIOSFix(context,img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 600, 500);
 
-            // Initialize the second canvas
-            var canvas2 = document.getElementById('dataCanvas');
-            var context2 = canvas2.getContext("2d");
-            context2.font = '20pt Calibri';
-            context2.fillStyle = "black";
-            context2.fillText("Blue intensity image will go here", 10, 20);
+          /*  +++++++++++++++ BEGIN IMAGE PROCESSING +++++++++++++++ */
+          /*  ++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
 
-            // Get the file input element
-            var fileInput = document.getElementById('fileInput');
-            var messageDisplayArea = document.getElementById('messageDisplayArea');
+          /* PUT ANY CHANGES TO THE JAVASCRIPT HERE  */
+          
+      // Get image data (pixel info) from the original canvas
+              var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+              var data = imageData.data; // Pixel data is in a 1D array
+      // Get the second canvas and its context
+              var canvas2 = document.getElementById('dataCanvas');
+              var context2 = canvas2.getContext("2d");          
+      // Create a new blank imageData object for the second canvas
+              var blueImage = context2.createImageData(canvas2.width, canvas2.height);
+              var blueData = blueImage.data;
+      // Loop through each pixel in the image (4 values per pixel: R, G, B, A)
+              for (var i = 0; i < data.length; i += 4) {
+                var blue = data[i + 2]; // Extract only the blue value, this part confuses me  
+      // Code for the qualities of the blue image
+                blueData[i] = 0;         // Red channel = 0
+                blueData[i + 1] = 0;     // Green channel = 0
+                blueData[i + 2] = blue;  // Blue channel = original blue value
+                blueData[i + 3] = 255;   // Alpha channel = fully opaque
+              }
+        // Draw the blue-only image onto the second canvas
+              context2.putImageData(blueImage, 0, 0);
+          } 
+       
+       // End of img.onload, rest is continuation of Dr. Riedel's code
+        
+        img.src = reader.result;
+      } //  end of reader.onload
+      
+      reader.readAsDataURL(file);
+    } // end of the if statement checking that file is an image
+    else
+    {
+      // this is what happens if the orignial file selected is not an image file
+      messageDisplayArea.innerHTML = "File not supported!"
+    } // end of the else statement if file in NOT an image
+  }); // end of the fileInput.addEventListener function
+ } // end of the window.onload function
+ </script>
+ </head>
 
-            // Event listener for file input changes
-            fileInput.addEventListener('change', function (e) {
-                var file = fileInput.files[0]; // Get the selected file
-                var imageType = /image.*/; // Define image type pattern
+ <body>
+  <div data-role="page">
+    <div data-role="header">
+    <h1>Primary Colors</h1></div><!-- /header -->
+    <div data-role="content">	
+      <h2>Push button to take picture.</h2>
+      <div>
+        Press orange button to create or choose image file:
+        <input type="file" id="fileInput" STYLE="background-color: #FF6600;">
+      </div>
+      <div id="messageDisplayArea"></div>
+      
+      <canvas id="myCanvas" width=600 height=500 style="border:1px solid #d3d3d3;"></canvas>
+      <script> /* This script initiates the cavas and puts the text on the canvas "myCanvas" */
+        var canvas = document.getElementById('myCanvas');
+        var context = canvas.getContext("2d");
+        context.font = '20pt Calibri';
+        context.fillStyle = "black";
+        context.fillText("Original image will go here", 10, 20);
+      </script>
+      <!-- Blue-only image canvas, uses same layout just a second copy of the image which will be modified-->
+     <canvas id="dataCanvas" width="600" height="500" style="border:1px solid #d3d3d3; margin-top: 10px;"></canvas>
+     <script>
+     var canvas2 = document.getElementById('dataCanvas');
+     var context2 = canvas2.getContext("2d");
+     context2.font = '20pt Calibri';
+     context2.fillStyle = "black";
+     context2.fillText("Blue intensity image will go here", 10, 20);
+  </script>
+</div>
+   
 
-                // Check if the file is an image
-                if (file.type.match(imageType)) {
-                    var reader = new FileReader(); // New file reader
-
-                    // What to do after the file is read
-                    reader.onload = function (e) {
-                        messageDisplayArea.innerHTML = "You picked an image!"; // Display message
-
-                        var img = new Image(); // Create a new image
-
-                        // What to do after the image is loaded
-                        img.onload = function () {
-                            // Set canvas dimensions to match image
-                            canvas.width = img.naturalWidth;
-                            canvas.height = img.naturalHeight;
-                            canvas2.width = img.naturalWidth;
-                            canvas2.height = img.naturalHeight;
-
-                            // Clear initial placeholder text
-                            context.clearRect(0, 0, canvas.width, canvas.height);
-                            context2.clearRect(0, 0, canvas2.width, canvas2.height);
-
-                            // Draw original image with iOS fix
-                            drawImageIOSFix(context, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, img.naturalWidth, img.naturalHeight);
-
-                            /*  +++++++++++++++ BEGIN IMAGE PROCESSING +++++++++++++++ */
-                            /*  ++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-
-                            // Get image data from the first canvas
-                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                            const data = imageData.data; // Actual pixel data
-
-                            // Create a new image data object for the blue-only image
-                            const blueImage = context2.createImageData(canvas.width, canvas.height);
-                            const blueData = blueImage.data; // Pixel data for the blue image
-
-                            // Loop through each pixel and extract blue intensity
-                            for (let i = 0; i < data.length; i += 4) {
-                                // i is the index of the red component
-                                // i+1 is the green
-                                // i+2 is the blue
-                                // i+3 is the alpha (opacity)
-
-                                blueData[i] = 0;          // Red component set to 0
-                                blueData[i + 1] = 0;      // Green component set to 0
-                                blueData[i + 2] = data[i + 2]; // Blue component from original image
-                                blueData[i + 3] = 255;    // Alpha (fully opaque)
-                            }
-
-                            // Put the blue-only image data onto the second canvas
-                            context2.putImageData(blueImage, 0, 0);
-
-                            /*  +++++++++++++++  END IMAGE PROCESSING  +++++++++++++++ */
-                            /*  ++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-
-                            console.log("Blue-only image rendered."); // Log to console
-
-                        }; // End of img.onload
-
-                        img.src = reader.result; // Set the image source to the loaded file
-                    } // End of reader.onload
-
-                    reader.readAsDataURL(file); // Read the file as a data URL
-                } // End of the if statement checking that file is an image
-                else {
-                    messageDisplayArea.innerHTML = "File not supported!"; // If file is not an image
-                } // End of the else statement if file in NOT an image
-            }); // End of the fileInput.addEventListener function
-        } // End of the window.onload function
-    </script>
-</head>
-
-<body>
-    <div data-role="page">
-        <div data-role="header">
-            <h1>Primary Colors</h1>
-        </div><!-- /header -->
-        <div data-role="content">
-            <h2>Push button to take picture.</h2>
-            <div>
-                Press orange button to create or choose image file:
-                <input type="file" id="fileInput" STYLE="background-color: #FF6600;">
-            </div>
-            <div id="messageDisplayArea"></div>
-
-            <canvas id="myCanvas" style="border:1px solid #d3d3d3;"></canvas>
-            <canvas id="dataCanvas" style="border:1px solid #d3d3d3; margin-top:10px;"></canvas>
-
-            <div data-role="footer" data-position="fixed">
-                <p>DIY Diagnostics</p>
-            </div><!-- /footer -->
-        </div><!-- /page -->
-</body>
+    </div><!-- /content -->
+    <div data-role="footer" data-position="fixed">
+      <p>DIY Diagnostics</p>
+    </div><!-- /footer -->
+  </div><!-- /page -->
+ </body>
 </html>

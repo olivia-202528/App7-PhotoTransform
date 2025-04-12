@@ -107,38 +107,36 @@
         /* new Image() and img.onload start some kind of new image creation process in javaScript. I do not understand why this is necessary although it may simply slow things down to let the image load. */
         var img = new Image();
         img.onload = function() {
-          /*This finally draws the image onto the first drawing canvas. The specific canvas is referred to by "context". This is established down in the HTML part of the file just under the first <canvas> tag. If we weren't worried about fixing an iPhone bug we would use context.drawImage(image, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 600, 500) instead of drawImageIOSFix */
-        // Set canvas dimensions to match image
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-                    canvas2.width = img.naturalWidth;
-                    canvas2.height = img.naturalHeight;         
-         
-         drawImageIOSFix(context,img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, 600, 500);
+  // Set canvas dimensions to match image
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  canvas2.width = img.naturalWidth;
+  canvas2.height = img.naturalHeight;
 
-          /*  +++++++++++++++ BEGIN IMAGE PROCESSING +++++++++++++++ */
-          /*  ++++++++++++++++++++++++++++++++++++++++++++++++++++++ */
+  // Clear initial placeholder text
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context2.clearRect(0, 0, canvas2.width, canvas2.height);
 
-          /* PUT ANY CHANGES TO THE JAVASCRIPT HERE  */
-          
-      // Get image data (pixel info) from the original canvas
-              var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-              var data = imageData.data; // Pixel data is in a 1D array
-         // Create a new blank imageData object for the second canvas 
-              var blueImage = context2.createImageData(canvas.width, canvas.height);
-              var blueData = blueImage.data;
-            
-      // Loop through each pixel in the image (4 values per pixel: R, G, B, A)
-              for (var i = 0; i < data.length; i += 4) {
-                var blue = data[i + 2]; // Extract only the blue value, this part confuses me  
-      // Code for the qualities of the blue image
-                blueData[i] = 0;         // Red channel = 0
-                blueData[i + 1] = 0;     // Green channel = 0
-                blueData[i + 2] = blue;  // Blue channel = original blue value
-                blueData[i + 3] = 255;   // Alpha channel = fully opaque
-              }
-        // Draw the blue-only image onto the second canvas
-              context2.putImageData(blueImage, 0, 0);
+  // Draw original image with iOS fix
+  drawImageIOSFix(context, img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, img.naturalWidth, img.naturalHeight);
+
+  // Process pixels for blue channel
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  const blueImage = context2.createImageData(canvas.width, canvas.height);
+  const blueData = blueImage.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    blueData[i] = 0;          // Red
+    blueData[i + 1] = 0;      // Green
+    blueData[i + 2] = data[i + 2]; // Blue
+    blueData[i + 3] = 255;    // Alpha
+  }
+
+  // Render blue-filtered image
+  context2.putImageData(blueImage, 0, 0);
+};
+
                console.log("Blue-only image rendered.");
           }; 
        

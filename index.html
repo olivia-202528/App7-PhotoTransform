@@ -120,8 +120,11 @@
                 blueData[i + 2] = blue;  // Blue channel = original blue value
                 blueData[i + 3] = 255;   // Alpha channel = fully opaque
               }
+        // Draw the blue-only image onto the second canvas
+              context2.putImageData(blueImage, 0, 0);
           } 
-       // end of img.onload
+       
+       // End of img.onload, rest is continuation of Dr. Riedel's code
         
         img.src = reader.result;
       } //  end of reader.onload

@@ -104,9 +104,10 @@
           
       // Get image data (pixel info) from the original canvas
               var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-              var data = imageData.data; // Pixel data is in a 1D array [R,G,B,A,R,G,B,A,...]
-
-          
+              var data = imageData.data; // Pixel data is in a 1D array
+      // Get the second canvas and its context
+              var canvas2 = document.getElementById('dataCanvas');
+              var context2 = canvas2.getContext("2d");          
           
         } // end of img.onload
         
